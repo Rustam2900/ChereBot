@@ -1,13 +1,10 @@
-from aiogram import Router
+from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
-from bot.api import create_user
-from bot.conustant import MAIN_TEXT
-
-from aiogram import types
-
-from bot.header.orders import Form
+from api import create_user
+from conustant import MAIN_TEXT
+from header.orders import Form
 
 router = Router()
 

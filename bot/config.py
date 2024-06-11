@@ -1,8 +1,9 @@
-from dotenv import dotenv_values
+import os
+from dotenv import load_dotenv
 
-envfile = dotenv_values(".env")
-# admin_id = envfile['ADMIN_ID']
-bot_token = envfile['BOT_TOKEN']
+load_dotenv()
+
+BOT_TOKEN = os.getenv('BOT_TOKEN', None)
 
 # lang_text = 'Select a language\n\nВыберите языкn\n\nTilni tanglang'
 #

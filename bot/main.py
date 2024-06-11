@@ -6,9 +6,9 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-from config import bot_token
-from bot.header.start import router as router_start
-from bot.header.orders import router as router_orders
+from config import BOT_TOKEN
+from header.start import router as router_start
+from header.orders import router as router_orders
 
 router = Router()
 router.include_router(router_start)
@@ -70,7 +70,7 @@ router.include_router(router_orders)
 #     locale = user_languages.get(user_id, 'uz')
 #     await message.reply(get_translation(locale, "Siz yuborgan xabar: {text}").format(text=message.text))
 
-bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
 async def main() -> None:

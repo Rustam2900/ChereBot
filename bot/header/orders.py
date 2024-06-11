@@ -3,8 +3,8 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS
-from bot.keyboard.k_button import main_menu, contact_user, back, settings, lang_change
+from conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS
+from keyboard.k_button import main_menu, contact_user, back, settings, lang_change
 
 router = Router()
 
