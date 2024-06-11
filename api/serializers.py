@@ -5,10 +5,21 @@ from rest_framework.serializers import ModelSerializer
 class BotUserSerializers(ModelSerializer):
     class Meta:
         model = BotUser
-        fields = '__all__'
+        fields = [
+            'user_id',
+            'name',
+            'username',
+            'create_at',
+        ]
 
 
 class UserWaterSerializer(ModelSerializer):
     class Meta:
         model = UserWater
-        fields = '__all__'
+        fields = [
+            'title',
+            'orders',
+            'latitude',
+            'longitude',
+            'create_at',
+        ]
