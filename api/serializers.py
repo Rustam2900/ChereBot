@@ -1,4 +1,4 @@
-from .models import BotUser, UserWater
+from .models import BotUser, Product, Order
 from rest_framework.serializers import ModelSerializer
 
 
@@ -6,20 +6,31 @@ class BotUserSerializers(ModelSerializer):
     class Meta:
         model = BotUser
         fields = [
-            'user_id',
+            'telegram_id',
             'name',
             'username',
-            'create_at',
-        ]
-
-
-class UserWaterSerializer(ModelSerializer):
-    class Meta:
-        model = UserWater
-        fields = [
-            'title',
-            'orders',
             'latitude',
             'longitude',
             'create_at',
+            'language',
+        ]
+
+
+class ProductSerializers(ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            'name',
+            'description',
+            'price'
+        ]
+
+
+class OrderSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            'user',
+            'product',
+            'amount'
         ]

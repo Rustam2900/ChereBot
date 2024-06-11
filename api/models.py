@@ -8,11 +8,11 @@ class LanguageCodes(models.TextChoices):
 
 
 class BotUser(models.Model):
-    telegram_id = models.BigIntegerField(max_length=100, unique=True)
+    telegram_id = models.BigIntegerField(unique=True)
     name = models.CharField(max_length=100)
     username = models.CharField(max_length=100, null=True, blank=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.DecimalField(max_digits=12, decimal_places=9)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9)
     create_at = models.DateTimeField(auto_now_add=True)
     language = models.CharField(
         max_length=2,
@@ -34,4 +34,9 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    pass
+    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='order')
+    product = models.BigIntegerField()
+    amount = models.IntegerField()
+
+    def __str__(self):
+        return self.amount
