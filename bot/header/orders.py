@@ -12,6 +12,9 @@ router = Router()
 class Form(StatesGroup):
     name = State()
     number = State()
+    location = State()
+
+    # product_id = State()
     number05 = State()
     number1 = State()
     number2 = State()
