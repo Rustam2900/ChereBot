@@ -5,13 +5,8 @@ from conustant import ORDERS, MY_ORDERS, OPERATOR, SETTINGS, BACK, LANG_CHANGE, 
 
 def main_menu():
     kb = [
-        [KeyboardButton(text=ORDERS),
-         KeyboardButton(text=MY_ORDERS)],
-        [
-            KeyboardButton(text=OPERATOR),
-            KeyboardButton(text=SETTINGS)
-
-        ]
+        [KeyboardButton(text=ORDERS), KeyboardButton(text=MY_ORDERS)],
+        [KeyboardButton(text=OPERATOR), KeyboardButton(text=SETTINGS)]
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return keyboard

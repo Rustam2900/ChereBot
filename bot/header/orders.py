@@ -9,7 +9,7 @@ from keyboard.k_button import main_menu, contact_user, back, settings, lang_chan
 router = Router()
 
 
-class Form(StatesGroup):
+class UserForm(StatesGroup):
     name = State()
     number = State()
     location = State()
@@ -23,46 +23,9 @@ class Form(StatesGroup):
     number20 = State()
 
 
-class FormWater(StatesGroup):
+class ProductFrom(StatesGroup):
     template = State()
 
-
-@router.message(Form.name)
-async def contact_(message: types.Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await message.answer(text='nomerizni kiriting', reply_markup=contact_user())
-    await state.set_state(Form.number)
-
-
-@router.message(Form.number)
-async def get_contact(message: types.Message, state: FSMContext):
-    contact = message.contact.phone_number
-    await state.update_data(number=contact)
-
-    user_data = await state.get_data()
-
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue")],
-        [InlineKeyboardButton(text="Bekor qilish ❌", callback_data="cancel")]
-    ])
-    text_data = f"Rahmat, ismiz: {user_data['name']}! \n\n "
-    f"Sizning nomeringiz: {user_data['number']} \n\n"
-    f"agar malumotlariz to'g'ri bo'lsa davom ettiring"
-
-    await message.answer(text=text_data, reply_markup=keyboard)
-    await state.clear()
-
-
-@router.callback_query(lambda c: c.data == 'continue')
-async def process_continue(callback_query: types.CallbackQuery):
-    await callback_query.message.answer(text="Bo‘limni tanlang 〽️:", reply_markup=main_menu())
-    await callback_query.answer()
-
-
-@router.callback_query(lambda c: c.data == 'cancel')
-async def process_cancel(callback_query: types.CallbackQuery):
-    await callback_query.message.reply("Bekor qilindi. /start buyrug'ini qayta kiriting.")
-    await callback_query.answer()
 
 
 @router.message(F.text == BACK)
@@ -131,12 +94,12 @@ async def water_05_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue05')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number05)
+    await state.set_state(UserForm.number05)
     await callback_query.message.answer('0.5 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number05)
+@router.message(UserForm.number05)
 async def number_05(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -160,12 +123,12 @@ async def water_1_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue1')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number1)
+    await state.set_state(UserForm.number1)
     await callback_query.message.answer('1 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number1)
+@router.message(UserForm.number1)
 async def number_1(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -189,12 +152,12 @@ async def water_2_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue2')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number2)
+    await state.set_state(UserForm.number2)
     await callback_query.message.answer('2 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number2)
+@router.message(UserForm.number2)
 async def number_2(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -218,12 +181,12 @@ async def water_5_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue5')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number5)
+    await state.set_state(UserForm.number5)
     await callback_query.message.answer('5 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number5)
+@router.message(UserForm.number5)
 async def number_5(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -247,12 +210,12 @@ async def water_10_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue10')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number10)
+    await state.set_state(UserForm.number10)
     await callback_query.message.answer('10 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number10)
+@router.message(UserForm.number10)
 async def number_10(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -277,12 +240,12 @@ async def water_20_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'continue20')
 async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Form.number20)
+    await state.set_state(UserForm.number20)
     await callback_query.message.answer('20 L suvdan nechta olishiz kiring')
     await callback_query.answer()
 
 
-@router.message(Form.number20)
+@router.message(UserForm.number20)
 async def number_20(message: types.Message, state: FSMContext):
     await state.update_data(number=message.text)
     user_data = await state.get_data()
@@ -292,7 +255,7 @@ async def number_20(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-@router.callback_query(Form.number20, lambda c: c.data == 'finish')
+@router.callback_query(UserForm.number20, lambda c: c.data == 'finish')
 async def finish_count(callback_query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get('name')
