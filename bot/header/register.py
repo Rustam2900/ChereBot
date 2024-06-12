@@ -34,12 +34,6 @@ async def number(message: types.Message, state: FSMContext):
 
 @router.message(RegisterForm.location)
 async def location(message: types.Message, state: FSMContext):
-    user_data = await state.get_data()
-
-    if 'number' not in user_data:
-        await message.answer("Telefon raqamingizni avval yuboring.")
-        return
-
     print("**************88")
     print("latitude", message.location.latitude)
     print("longitude", message.location.longitude)
