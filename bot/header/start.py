@@ -2,9 +2,9 @@ from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
-from conustant import MAIN_TEXT
-from header.register import RegisterForm
-from keyboard.k_button import main_menu
+from bot.conustant import MAIN_TEXT
+from bot.header.register import RegisterForm
+from bot.keyboard.k_button import main_menu
 
 router = Router()
 

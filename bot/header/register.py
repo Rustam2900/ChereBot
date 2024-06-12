@@ -1,13 +1,12 @@
-from aiogram import Router, types, F
+from aiogram import Router, types
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS
-from keyboard.k_button import main_menu, contact_user, back, settings, lang_change
-
+from bot.api import create_user
+from bot.keyboard.k_button import contact_user, location_user
 
 router = Router()
+
 
 class RegisterForm(StatesGroup):
     name = State()
@@ -23,41 +22,36 @@ async def name(message: types.Message, state: FSMContext):
     await state.set_state(RegisterForm.number)
 
 
-
 @router.message(RegisterForm.number)
 async def number(message: types.Message, state: FSMContext):
     contact = message.contact.phone_number
     await state.update_data(number=contact)
+    print(contact)
 
-    # user_data = await state.get_data()
-
-    # keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    #     [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue")],
-    #     [InlineKeyboardButton(text="Bekor qilish ❌", callback_data="cancel")]
-    # ])
-    # text_data = f"Rahmat, ismiz: {user_data['name']}! \n\n "
-    # f"Sizning nomeringiz: {user_data['number']} \n\n"
-    # f"agar malumotlariz to'g'ri bo'lsa davom ettiring"
-
-    await message.answer(text='lokatsiyani yuboring')
+    await message.answer(text='lokatsiyani yuboring', reply_markup=location_user())
     await state.set_state(RegisterForm.location)
-    # await state.clear()
-
-
-# @router.callback_query(lambda c: c.data == 'continue')
-# async def process_continue(callback_query: types.CallbackQuery):
-#     await callback_query.message.answer(text="Bo‘limni tanlang 〽️:", reply_markup=main_menu())
-#     await callback_query.answer()
-# @router.callback_query(lambda c: c.data == 'cancel')
-# async def process_cancel(callback_query: types.CallbackQuery):
-#     await callback_query.message.reply("Bekor qilindi. /start buyrug'ini qayta kiriting.")
-#     await callback_query.answer()
 
 
 @router.message(RegisterForm.location)
 async def location(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+
+    if 'number' not in user_data:
+        await message.answer("Telefon raqamingizni avval yuboring.")
+        return
+
     print("**************88")
-    print(message.location)
-    # await state.update_data(number=contact)
-    await message.answer('shit bruh')
-    state.clear()
+    print("latitude", message.location.latitude)
+    print("longitude", message.location.longitude)
+    user_data = await state.get_data()
+    response_message = create_user(
+        telegram_id=message.from_user.id,
+        name=message.from_user.first_name,
+        username=message.from_user.full_name,
+        phone=user_data['number'],
+        latitude=message.location.latitude,
+        longitude=message.location.longitude,
+        language=message.from_user.language_code
+    )
+    await message.answer(response_message)
+    await state.clear()

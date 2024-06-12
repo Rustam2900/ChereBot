@@ -20,6 +20,14 @@ def contact_user():
     return keyboard
 
 
+def location_user():
+    kb = [
+        [KeyboardButton(text='location', request_location=True)]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
+    return keyboard
+
+
 def back():
     kb = [
         [KeyboardButton(text=BACK)]
