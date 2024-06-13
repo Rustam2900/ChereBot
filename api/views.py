@@ -1,5 +1,5 @@
-from .models import BotUser, Product, Order
-from .serializers import BotUserSerializers, ProductSerializers, OrderSerializer
+from .models import BotUser, Product, Order, Operator
+from .serializers import BotUserSerializers, ProductSerializers, OrderSerializer, OperatorSerializer
 from rest_framework.generics import ListCreateAPIView
 
 
@@ -16,3 +16,8 @@ class ProductApiView(ListCreateAPIView):
 class OrderApiView(ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+
+class OperatorApiView(ListCreateAPIView):
+    queryset = Operator.objects.all()
+    serializer_class = OperatorSerializer

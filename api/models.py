@@ -9,9 +9,8 @@ class LanguageCodes(models.TextChoices):
 
 class BotUser(models.Model):
     telegram_id = models.BigIntegerField(unique=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    username = models.CharField(max_length=100, null=True, blank=True)
-    phone = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=30)
     latitude = models.DecimalField(max_digits=12, decimal_places=9)
     longitude = models.DecimalField(max_digits=12, decimal_places=9)
     create_at = models.DateTimeField(auto_now_add=True)
@@ -41,3 +40,11 @@ class Order(models.Model):
 
     def __str__(self):
         return self.amount
+
+
+class Operator(models.Model):
+    text = models.TextField()
+    operator_phone = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.text

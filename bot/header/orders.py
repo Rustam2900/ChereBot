@@ -5,6 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS
 from bot.keyboard.k_button import main_menu, back, settings, lang_change
+from bot.api import get_product
 
 router = Router()
 
@@ -28,6 +29,8 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[
 
 ])
 
+x = get_product()
+
 
 @router.message(F.text == ORDERS)
 async def orders_(message: types.Message):
@@ -42,8 +45,9 @@ async def water_05_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="0.5 L suv ... 😊\n\n"
-                                             "narxi: 2500 so'm", reply_markup=keyboard_water05)
+    await callback_query.message.answer(text=f"{x[0]['name']} \n\n"
+                                             f"{x[0]['description']} \n\n"
+                                             f"narxi: {x[0]['price']}", reply_markup=keyboard_water05)
     await callback_query.answer()
 
 
@@ -71,8 +75,9 @@ async def water_1_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="1 L suv ... 😊\n\n"
-                                             "narxi: 5000 so'm", reply_markup=keyboard_water1)
+    await callback_query.message.answer(text=f"{x[1]['name']} \n\n"
+                                             f"{x[1]['description']} \n\n"
+                                             f"narxi: {x[1]['price']}", reply_markup=keyboard_water1)
     await callback_query.answer()
 
 
@@ -100,8 +105,9 @@ async def water_2_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="2 L suv ... 😊\n\n"
-                                             "narxi: 1200 so'm", reply_markup=keyboard_water2)
+    await callback_query.message.answer(text=f"{x[2]['name']} \n\n"
+                                             f"{x[2]['description']} \n\n"
+                                             f"narxi: {x[2]['price']}", reply_markup=keyboard_water2)
     await callback_query.answer()
 
 
@@ -129,8 +135,9 @@ async def water_5_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="5 L suv ... 😊\n\n"
-                                             "narxi: 15000 so'm", reply_markup=keyboard_water5)
+    await callback_query.message.answer(text=f"{x[3]['name']} \n\n"
+                                             f"{x[3]['description']} \n\n"
+                                             f"narxi: {x[0]['price']}", reply_markup=keyboard_water5)
     await callback_query.answer()
 
 
@@ -158,8 +165,9 @@ async def water_10_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="10 L suv ... 😊\n\n"
-                                             "narxi: 20000 so'm", reply_markup=keyboard_water10)
+    await callback_query.message.answer(text=f"{x[4]['name']} \n\n"
+                                             f"{x[4]['description']} \n\n"
+                                             f"narxi: {x[4]['price']}", reply_markup=keyboard_water10)
     await callback_query.answer()
 
 
@@ -187,8 +195,9 @@ async def water_20_(callback_query: types.CallbackQuery):
          InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
-    await callback_query.message.answer(text="20 L suv ... 😊 \n\n"
-                                             "narxi: 25000 so'm", reply_markup=keyboard_water20)
+    await callback_query.message.answer(text=f"{x[5]['name']} \n\n"
+                                             f"{x[5]['description']} \n\n"
+                                             f"narxi: {x[5]['price']}", reply_markup=keyboard_water20)
     await callback_query.answer()
 
 
@@ -208,30 +217,6 @@ async def number_20(message: types.Message, state: FSMContext):
                          f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
     await state.clear()
 
-
-# @router.callback_query(UserForm.number20, lambda c: c.data == 'finish')
-# async def finish_count(callback_query: types.CallbackQuery, state: FSMContext):
-#     data = await state.get_data()
-#     name = data.get('name')
-#     number = data.get('number')
-#     number05 = data.get('number05')
-#     number1 = data.get('number1')
-#     number2 = data.get('number2')
-#     number5 = data.get('number5')
-#     number10 = data.get('number10')
-#     number20 = data.get('number20')
-#
-#     await callback_query.message.answer(
-#         f"Sizni malumotlariz ismiz: {name} \n\n"
-#         f"Raqamiz: {number} \n\n"
-#         f"0.5 L: {number05} ta \n\n"
-#         f"1 L: {number1} ta \n\n"
-#         f"2 L: {number2} ta \n\n"
-#         f"5 L: {number5} ta \n\n"
-#         f"10 L: {number10} ta \n\n"
-#         f"20 L: {number20} ta \n\n"
-#         f"siz bergan buyurtmalariz uchun rahmat 😊"
-#     )
 
 @router.message(F.text == BACK)
 async def back_(message: types.Message):
