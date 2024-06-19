@@ -2,7 +2,7 @@ from aiogram import Router, types
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-from bot.api import create_user
+from bot.api import create_or_update_user
 from bot.keyboard.k_button import contact_user, location_user
 
 router = Router()
@@ -38,7 +38,7 @@ async def location(message: types.Message, state: FSMContext):
 
     user_data = await state.get_data()
 
-    await message.answer(create_user(
+    await message.answer(create_or_update_user(
         telegram_id=message.from_user.id,
         name=user_data['name'],
         phone=user_data['number'],

@@ -3,21 +3,11 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS
-from bot.keyboard.k_button import main_menu, back, settings, lang_change
-from bot.api import get_product
+from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, LOCATION_CHANGE
+from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user
+from bot.api import get_product, create_order
 
 router = Router()
-
-
-class UserForm(StatesGroup):
-    number05 = State()
-    number1 = State()
-    number2 = State()
-    number5 = State()
-    number10 = State()
-    number20 = State()
-
 
 keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🏔 0.5 L", callback_data="water_05"),
@@ -26,10 +16,16 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🏔 5 L", callback_data="water_5"),
      InlineKeyboardButton(text="🏔 10 L", callback_data="water_10"),
      InlineKeyboardButton(text="🏔 20 L", callback_data="water_20")],
+    [InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")]
 
 ])
 
 x = get_product()
+
+
+class UserForm(StatesGroup):
+    product = State()
+    amount = State()
 
 
 @router.message(F.text == ORDERS)
@@ -41,8 +37,8 @@ async def orders_(message: types.Message):
 @router.callback_query(lambda c: c.data == 'water_05')
 async def water_05_(callback_query: types.CallbackQuery):
     keyboard_water05 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue05"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[0]['name']} \n\n"
@@ -51,28 +47,11 @@ async def water_05_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue05')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number05)
-    await callback_query.message.answer('0.5 L suvdan nechta olishiz kiring')
-    await callback_query.answer()
-
-
-@router.message(UserForm.number05)
-async def number_05(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    user_data = await state.get_data()
-    await message.answer(f"Siz 0.5 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
-    await state.clear()
-
-
 @router.callback_query(lambda c: c.data == 'water_1')
 async def water_1_(callback_query: types.CallbackQuery):
     keyboard_water1 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue1"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[1]['name']} \n\n"
@@ -81,28 +60,11 @@ async def water_1_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue1')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number1)
-    await callback_query.message.answer('1 L suvdan nechta olishiz kiring')
-    await callback_query.answer()
-
-
-@router.message(UserForm.number1)
-async def number_1(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    user_data = await state.get_data()
-    await message.answer(f"Siz 1 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
-    await state.clear()
-
-
 @router.callback_query(lambda c: c.data == 'water_2')
 async def water_2_(callback_query: types.CallbackQuery):
     keyboard_water2 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue2"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[2]['name']} \n\n"
@@ -111,28 +73,11 @@ async def water_2_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue2')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number2)
-    await callback_query.message.answer('2 L suvdan nechta olishiz kiring')
-    await callback_query.answer()
-
-
-@router.message(UserForm.number2)
-async def number_2(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    user_data = await state.get_data()
-    await message.answer(f"Siz 2 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
-    await state.clear()
-
-
 @router.callback_query(lambda c: c.data == 'water_5')
 async def water_5_(callback_query: types.CallbackQuery):
     keyboard_water5 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue5"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[3]['name']} \n\n"
@@ -141,28 +86,11 @@ async def water_5_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue5')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number5)
-    await callback_query.message.answer('5 L suvdan nechta olishiz kiring')
-    await callback_query.answer()
-
-
-@router.message(UserForm.number5)
-async def number_5(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    user_data = await state.get_data()
-    await message.answer(f"Siz 5 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
-    await state.clear()
-
-
 @router.callback_query(lambda c: c.data == 'water_10')
 async def water_10_(callback_query: types.CallbackQuery):
     keyboard_water10 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue10"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[4]['name']} \n\n"
@@ -171,28 +99,11 @@ async def water_10_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue10')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number10)
-    await callback_query.message.answer('10 L suvdan nechta olishiz kiring')
-    await callback_query.answer()
-
-
-@router.message(UserForm.number10)
-async def number_10(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
-    user_data = await state.get_data()
-    await message.answer(f"Siz 10 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
-    await state.clear()
-
-
 @router.callback_query(lambda c: c.data == 'water_20')
 async def water_20_(callback_query: types.CallbackQuery):
     keyboard_water20 = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Davom ettirish ✅", callback_data="continue20"),
-         InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+        [
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
 
     ])
     await callback_query.message.answer(text=f"{x[5]['name']} \n\n"
@@ -201,20 +112,36 @@ async def water_20_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == 'continue20')
-async def continue_(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(UserForm.number20)
-    await callback_query.message.answer('20 L suvdan nechta olishiz kiring')
+@router.callback_query(lambda c: c.data == 'Place_order')
+async def place_order_(callback_query: types.CallbackQuery, state: types.CallbackQuery):
+    await state.set_state(UserForm.product)
+    await callback_query.message.answer('Iltimos, suv turini kiriting: \n\n'
+                                        'Namuna: 5 L ')
     await callback_query.answer()
 
 
-@router.message(UserForm.number20)
-async def number_20(message: types.Message, state: FSMContext):
-    await state.update_data(number=message.text)
+@router.message(UserForm.product)
+async def process_product(message: types.Message, state: FSMContext):
+    await state.update_data(product=message.text)
+    await message.answer(text="Iltimos, sonnini  kiriting: \n\n"
+                              "Namuna: 10 ta ")
+    await state.set_state(UserForm.amount)
+
+
+@router.message(UserForm.amount)
+async def process_amount(message: types.Message, state: FSMContext):
+    await state.update_data(amount=message.text)
     user_data = await state.get_data()
-    await message.answer(f"Siz 20 L suvdan: \n\n"
-                         f" {user_data['number']} ta buyurtma berdiz! \n\n"
-                         f"Boshqa suvlardan ham olmoqchi bo'lsagiz davom ettirishiz mumkin", reply_markup=keyboard)
+    product = user_data['product']
+    amount = user_data['amount']
+    print(product)
+    print(amount)
+    await message.reply(f"Siz {product} suvdan \n\n"
+                        f"{amount} ta buyurtma qildingiz. \n\n"
+                        f"Boshqa turdagi suvdan qarid qilmoqchi bo'lsangiz \n\n"
+                        f"yana buyurtma berish tugmasini bosing: ")
+    await message.answer(
+        create_order(product_name=product, amount=amount))
     await state.clear()
 
 
@@ -257,3 +184,8 @@ async def lang_en(message: types.Message):
 async def back_(callback_query: types.CallbackQuery):
     await callback_query.message.answer(text="Tanlashiz mumkin 〽️", reply_markup=keyboard)
     await callback_query.answer()
+
+
+@router.message(F.text == LOCATION_CHANGE)
+async def location_change(message: types.Message):
+    await message.answer('Location yuboring', reply_markup=location_user())

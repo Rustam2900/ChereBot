@@ -1,6 +1,6 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from conustant import ORDERS, MY_ORDERS, OPERATOR, SETTINGS, BACK, LANG_CHANGE, LOCATION_CHANGE
+from ..conustant import ORDERS, MY_ORDERS, OPERATOR, SETTINGS, BACK, LANG_CHANGE, LOCATION_CHANGE, LOCATION
 
 
 def main_menu():
@@ -22,9 +22,10 @@ def contact_user():
 
 def location_user():
     kb = [
-        [KeyboardButton(text='location', request_location=True)]
+        [KeyboardButton(text=LOCATION),
+         KeyboardButton(text=BACK)]
     ]
-    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return keyboard
 
 

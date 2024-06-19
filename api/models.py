@@ -34,12 +34,12 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='order')
-    product = models.BigIntegerField()
+    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='orders')
+    product_name = models.CharField(max_length=100)
     amount = models.IntegerField()
 
     def __str__(self):
-        return self.amount
+        return f"{self.user} - {self.product_name} - {self.amount}"
 
 
 class Operator(models.Model):

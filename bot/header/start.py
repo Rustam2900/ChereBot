@@ -1,9 +1,7 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
-
 from bot.api import check_user_registration
-from bot.conustant import MAIN_TEXT
 from bot.header.register import RegisterForm
 from bot.keyboard.k_button import main_menu
 

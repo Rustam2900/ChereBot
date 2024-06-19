@@ -21,3 +21,5 @@ class OrderApiView(ListCreateAPIView):
 class OperatorApiView(ListCreateAPIView):
     queryset = Operator.objects.all()
     serializer_class = OperatorSerializer
+
+
