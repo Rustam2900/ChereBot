@@ -9,8 +9,6 @@ class BotUserSerializers(ModelSerializer):
             'telegram_id',
             'name',
             'phone',
-            'latitude',
-            'longitude',
             'create_at',
             'language',
         ]
@@ -30,9 +28,12 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'user',
-            'product',
-            'amount'
+            'user_id',
+            'product_name',
+            'amount',
+            'latitude',
+            'longitude'
+
         ]
 
 
@@ -43,6 +44,3 @@ class OperatorSerializer(ModelSerializer):
             'text',
             'operator_phone'
         ]
-
-
-

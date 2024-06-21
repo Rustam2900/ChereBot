@@ -3,9 +3,9 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, LOCATION_CHANGE
+from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, MY_ORDERS
 from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user
-from bot.api import get_product, create_order
+from bot.api import get_product, create_order, fetch_user_orders
 
 router = Router()
 
@@ -26,6 +26,7 @@ x = get_product()
 class UserForm(StatesGroup):
     product = State()
     amount = State()
+    location = State()
 
 
 @router.message(F.text == ORDERS)
@@ -36,9 +37,11 @@ async def orders_(message: types.Message):
 
 @router.callback_query(lambda c: c.data == 'water_05')
 async def water_05_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water05 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[0]['name']} \n\n"
@@ -49,9 +52,11 @@ async def water_05_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'water_1')
 async def water_1_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water1 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[1]['name']} \n\n"
@@ -62,9 +67,11 @@ async def water_1_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'water_2')
 async def water_2_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water2 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[2]['name']} \n\n"
@@ -75,9 +82,11 @@ async def water_2_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'water_5')
 async def water_5_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water5 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[3]['name']} \n\n"
@@ -88,9 +97,11 @@ async def water_5_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'water_10')
 async def water_10_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water10 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[4]['name']} \n\n"
@@ -101,9 +112,11 @@ async def water_10_(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == 'water_20')
 async def water_20_(callback_query: types.CallbackQuery):
+    await callback_query.message.reply_photo(photo="https://t.me/Rustam_python_bot/73")
     keyboard_water20 = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back")],
+            InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back"),
+            InlineKeyboardButton(text="Buyurtma berish", callback_data="Place_order")],
 
     ])
     await callback_query.message.answer(text=f"{x[5]['name']} \n\n"
@@ -131,17 +144,36 @@ async def process_product(message: types.Message, state: FSMContext):
 @router.message(UserForm.amount)
 async def process_amount(message: types.Message, state: FSMContext):
     await state.update_data(amount=message.text)
+    await message.answer(text="Location yuboring", reply_markup=location_user())
+    await state.set_state(UserForm.location)
+
+
+@router.message(UserForm.location)
+async def process_location(message: types.Message, state: FSMContext):
+    await state.update_data(location=message.text)
     user_data = await state.get_data()
     product = user_data['product']
     amount = user_data['amount']
+    latitude = message.location.latitude
+    longitude = message.location.longitude
+    print("#########")
     print(product)
     print(amount)
+    print("#########")
+    print('latitude', latitude)
+    print('longitude', longitude)
+    print("#########")
+
     await message.reply(f"Siz {product} suvdan \n\n"
                         f"{amount} ta buyurtma qildingiz. \n\n"
-                        f"Boshqa turdagi suvdan qarid qilmoqchi bo'lsangiz \n\n"
+                        f"Boshqa turdagi suvdan xarid qilmoqchi bo'lsangiz \n\n"
                         f"yana buyurtma berish tugmasini bosing: ")
-    await message.answer(
-        create_order(product_name=product, amount=amount))
+
+    order_message = create_order(user_id=message.from_user.id, product_name=product, amount=amount, latitude=latitude,
+                                 longitude=longitude)
+
+    await message.answer(order_message)
+
     await state.clear()
 
 
@@ -186,6 +218,16 @@ async def back_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.message(F.text == LOCATION_CHANGE)
-async def location_change(message: types.Message):
-    await message.answer('Location yuboring', reply_markup=location_user())
+@router.message(F.text == MY_ORDERS)
+async def my_orders(message: types.Message):
+    telegram_id = message.from_user.id
+    orders = await fetch_user_orders(telegram_id)
+    if orders and len(orders) > 0:
+
+        order_list = "\n\n".join(
+            [f"Mahsulot: {order['product_name']}, \n\n"
+             f"Miqdori: {order['amount']}" for order in
+             orders])
+        await message.answer(text=f"Sizning buyurtmalaringiz:\n\n{order_list}")
+    else:
+        await message.answer(text="Siz hali hech nima buyurtma qilmagansiz.")

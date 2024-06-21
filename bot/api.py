@@ -1,10 +1,11 @@
 import requests
 import json
+import aiohttp
 
 BASE_URL = 'http://localhost:8000/api/v1'
 
 
-def create_or_update_user(telegram_id, name, phone, latitude, longitude, language):
+def create_or_update_user(telegram_id, name, phone, language):
     url = f"{BASE_URL}/botusers/"
 
     # Get the user data
@@ -23,8 +24,6 @@ def create_or_update_user(telegram_id, name, phone, latitude, longitude, languag
         response = requests.put(update_url, data={
             'name': name,
             'phone': phone,
-            'latitude': latitude,
-            'longitude': longitude,
             'language': language
         })
         if response.status_code == 200:
@@ -37,8 +36,6 @@ def create_or_update_user(telegram_id, name, phone, latitude, longitude, languag
             'telegram_id': telegram_id,
             'name': name,
             'phone': phone,
-            'latitude': latitude,
-            'longitude': longitude,
             'language': language
         })
         if response.status_code == 201:
@@ -75,14 +72,34 @@ def get_operator():
         return []
 
 
-def create_order(product_name, amount):
+def create_order(user_id, product_name, amount, latitude, longitude):
     url = f"{BASE_URL}/order/"
-    response = requests.post(url, data={
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'user_id': user_id,
         'product_name': product_name,
-        'amount': amount
-    })
+        'amount': amount,
+        'latitude': latitude,
+        'longitude': longitude
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    if response.status_code == 201:
-        return "Buyurtma yaratildi."
+    print('r%%%%%%%%%%%%%')
+    print(response.json())
+
+    if response.status_code == 201:  # 201 - Created
+        return "Buyurtmangiz muvaffaqiyatli yaratildi!"
     else:
-        return f"Xatolik yuz berdi: {response.text}"
+        return f"Buyurtma yaratishda xatolik yuz berdi: {response.status_code}"
+
+
+async def fetch_user_orders(telegram_id):
+    url = f"{BASE_URL}/order/?telegram_id={telegram_id}"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                return None

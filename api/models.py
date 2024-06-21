@@ -11,8 +11,6 @@ class BotUser(models.Model):
     telegram_id = models.BigIntegerField(unique=True)
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
-    latitude = models.DecimalField(max_digits=12, decimal_places=9)
-    longitude = models.DecimalField(max_digits=12, decimal_places=9)
     create_at = models.DateTimeField(auto_now_add=True)
     language = models.CharField(
         max_length=2,
@@ -34,12 +32,14 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(BotUser, on_delete=models.CASCADE, related_name='orders')
+    user_id = models.BigIntegerField(unique=True)
     product_name = models.CharField(max_length=100)
     amount = models.IntegerField()
+    latitude = models.DecimalField(max_digits=12, decimal_places=9)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9)
 
     def __str__(self):
-        return f"{self.user} - {self.product_name} - {self.amount}"
+        return self.product_name
 
 
 class Operator(models.Model):

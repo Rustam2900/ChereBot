@@ -13,6 +13,7 @@ ORDERS = "🛒 Buyurtma berish"
 OPERATOR_TEXT = (f"{y[0]['text']} \n\n"
                  f"number: {y[0]['operator_phone']}")
 LOCATION = 'location yuborish'
+
 BACK = "⬅️ Orqaga"
 LANG_CHANGE = "🇺🇿🇷🇺🇬🇧 Tilni o‘zgartirish"
 LOCATION_CHANGE = "location o'zgartirish"

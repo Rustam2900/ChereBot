@@ -22,8 +22,8 @@ def contact_user():
 
 def location_user():
     kb = [
-        [KeyboardButton(text=LOCATION),
-         KeyboardButton(text=BACK)]
+        [KeyboardButton(text=LOCATION, request_location=True)
+         ]
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return keyboard
@@ -40,8 +40,9 @@ def back():
 def settings():
     kb = [
         [KeyboardButton(text=LANG_CHANGE),
-         KeyboardButton(text=LOCATION_CHANGE, request_location=True)],
-        [KeyboardButton(text=BACK)]
+         KeyboardButton(text=BACK)
+         ]
+
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return keyboard

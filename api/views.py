@@ -14,12 +14,15 @@ class ProductApiView(ListCreateAPIView):
 
 
 class OrderApiView(ListCreateAPIView):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        telegram_id = self.request.query_params.get('telegram_id', None)
+        if telegram_id is not None:
+            return Order.objects.filter(user_id__telegram_id=telegram_id)
+        return Order.objects.all()
 
 
 class OperatorApiView(ListCreateAPIView):
     queryset = Operator.objects.all()
     serializer_class = OperatorSerializer
-
-
