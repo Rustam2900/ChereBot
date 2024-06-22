@@ -1,5 +1,5 @@
 ### - - - - - - - - - - MENYU - - - - - - - - - - ###
-from bot.api import get_operator
+from bot.api_ import get_operator
 
 y = get_operator()
 MAIN_TEXT = "Assalom  botga xush kelibsiz "

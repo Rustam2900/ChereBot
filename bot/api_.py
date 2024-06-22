@@ -78,19 +78,20 @@ def create_order(user_id, product_name, amount, latitude, longitude):
         'Content-Type': 'application/json'
     }
     data = {
-        'user_id': user_id,
-        'product_name': product_name,
-        'amount': amount,
-        'latitude': latitude,
-        'longitude': longitude
+        "telegram_id": user_id,
+        "product_name": product_name,
+        "amount": amount,
+        "latitude": latitude,
+        "longitude": longitude
     }
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    print('r%%%%%%%%%%%%%')
-    print(response.json())
+    print(json.dumps(data))
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+    except Exception as e:
+        print(e)
 
     if response.status_code == 201:  # 201 - Created
-        return "Buyurtmangiz muvaffaqiyatli yaratildi!"
+        return "Buyurtmangiz muvaffaqiyatli yaratildi!",
     else:
         return f"Buyurtma yaratishda xatolik yuz berdi: {response.status_code}"
 

@@ -33,7 +33,6 @@ class OrderSerializer(ModelSerializer):
             'amount',
             'latitude',
             'longitude'
-
         ]
 
 

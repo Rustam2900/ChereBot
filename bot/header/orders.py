@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, MY_ORDERS
 from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user
-from bot.api import get_product, create_order, fetch_user_orders
+from bot.api_ import get_product, create_order, fetch_user_orders
 
 router = Router()
 
@@ -31,8 +31,9 @@ class UserForm(StatesGroup):
 
 @router.message(F.text == ORDERS)
 async def orders_(message: types.Message):
-    await message.reply_photo(photo="https://t.me/Rustam_python_bot/72")
-    await message.answer(text="O'zizga ketrakli suv haqida malumot bilishiz mumkin 😊", reply_markup=keyboard)
+    await message.reply_photo(photo="https://t.me/Rustam_python_bot/72",
+                              caption="O'zizga ketrakli suv haqida malumot bilishiz mumkin 😊",
+                              reply_markup=keyboard)
 
 
 @router.callback_query(lambda c: c.data == 'water_05')
@@ -156,13 +157,6 @@ async def process_location(message: types.Message, state: FSMContext):
     amount = user_data['amount']
     latitude = message.location.latitude
     longitude = message.location.longitude
-    print("#########")
-    print(product)
-    print(amount)
-    print("#########")
-    print('latitude', latitude)
-    print('longitude', longitude)
-    print("#########")
 
     await message.reply(f"Siz {product} suvdan \n\n"
                         f"{amount} ta buyurtma qildingiz. \n\n"
