@@ -41,7 +41,7 @@ def create_or_update_user(telegram_id, name, phone, language):
         if response.status_code == 201:
             return "Foydalanuvchi yaratildi."
         else:
-            return f"Xatolik yuz berdi: {response.text}"
+            return f"Xatolik yuz berdi: {response.status_code}"
 
 
 async def check_user_registration(telegram_id):
@@ -61,6 +61,9 @@ def get_product():
         return response.json()
     else:
         return []
+
+
+print(get_product())
 
 
 def get_operator():
@@ -91,7 +94,7 @@ def create_order(user_id, product_name, amount, latitude, longitude):
         print(e)
 
     if response.status_code == 201:  # 201 - Created
-        return "Buyurtmangiz muvaffaqiyatli yaratildi!",
+        return "Buyurtmangiz muvaffaqiyatli yaratildi!"
     else:
         return f"Buyurtma yaratishda xatolik yuz berdi: {response.status_code}"
 

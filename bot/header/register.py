@@ -3,7 +3,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 from bot.api_ import create_or_update_user
-from bot.keyboard.k_button import contact_user, location_user, main_menu
+from bot.keyboard.k_button import contact_user, main_menu
 
 router = Router()
 

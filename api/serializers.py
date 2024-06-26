@@ -21,6 +21,7 @@ class ProductSerializers(ModelSerializer):
             'name',
             'description',
             'price'
+
         ]
 
 
@@ -29,6 +30,7 @@ class OrderSerializer(ModelSerializer):
         model = Order
         fields = [
             'user_id',
+            'create_at',
             'product_name',
             'amount',
             'latitude',

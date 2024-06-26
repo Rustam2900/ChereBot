@@ -33,6 +33,7 @@ class Product(models.Model):
 
 class Order(models.Model):
     user_id = models.ForeignKey(BotUser, on_delete=models.CASCADE)
+    create_at = models.DateTimeField(auto_now_add=True)
     product_name = models.CharField(max_length=100)
     amount = models.IntegerField()
     latitude = models.DecimalField(max_digits=12, decimal_places=9)

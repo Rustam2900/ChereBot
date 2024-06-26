@@ -1,11 +1,15 @@
-from aiogram import Router, types, F
+import asyncio
+
+from aiogram import Router, types, F, Bot
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, MY_ORDERS
-from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user
+from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user, main_menu_ru, main_menu_en
 from bot.api_ import get_product, create_order, fetch_user_orders
+
+from datetime import datetime, timedelta
 
 router = Router()
 
@@ -198,12 +202,12 @@ async def lang_uz(message: types.Message):
 
 @router.message(F.text == '🇷🇺')
 async def lang_ru(message: types.Message):
-    await message.answer(text='Выберите действие 〽️:', reply_markup=None)
+    await message.answer(text='Выберите действие 〽️:', reply_markup=main_menu_ru())
 
 
 @router.message(F.text == '🇬🇧')
 async def lang_en(message: types.Message):
-    await message.answer(text='Choose an action 〽️:', reply_markup=None)
+    await message.answer(text='Choose an action 〽️:', reply_markup=main_menu_en())
 
 
 @router.callback_query(lambda c: c.data == 'back')
@@ -212,16 +216,37 @@ async def back_(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
+def format_time(time_string):
+    time_format = "%Y-%m-%dT%H:%M:%S.%f%z"
+    original_time = datetime.strptime(time_string, time_format)
+    adjusted_time = original_time + timedelta(hours=11, minutes=5)
+    return adjusted_time.strftime("%Y-%m-%d %H:%M")
+
+
+async def send_periodic_notifications(chat_id, order_time, bot: Bot):
+    start_time = datetime.strptime(order_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+    while True:
+        await asyncio.sleep(60)  # Har 1 daqiqada qayta tekshiradi
+        elapsed_time = datetime.now(start_time.tzinfo) - start_time
+        elapsed_seconds = elapsed_time.total_seconds()
+        if elapsed_seconds > 60:  # 60 sekunddan ko'p vaqt o'tganini tekshirish
+            await bot.send_message(chat_id,
+                                   text=f"Assalom, siz buyurtma berganingizga {int(elapsed_seconds // 60)} vaxt bo'ldi. Suvingiz tugamadimi? Bizning vazifamiz eslatib turish.")
+            break
+
+
 @router.message(F.text == MY_ORDERS)
-async def my_orders(message: types.Message):
+async def my_orders(message: types.Message, bot: Bot):
     telegram_id = message.from_user.id
     orders = await fetch_user_orders(telegram_id)
     if orders and len(orders) > 0:
-
         order_list = "\n\n".join(
-            [f"Mahsulot: {order['product_name']}, \n\n"
-             f"Miqdori: {order['amount']}" for order in
-             orders])
+            [f"Vaxti: {format_time(order['create_at'])}, \n\n"
+             f"Mahsulot: {order['product_name']}, \n\n"
+             f"Miqdori: {order['amount']}" for order in orders])
         await message.answer(text=f"Sizning buyurtmalaringiz:\n\n{order_list}")
+        # Har bir buyurtma uchun xabar yuborishni boshlash
+        for order in orders:
+            asyncio.create_task(send_periodic_notifications(message.chat.id, order['create_at'], bot))
     else:
         await message.answer(text="Siz hali hech nima buyurtma qilmagansiz.")
