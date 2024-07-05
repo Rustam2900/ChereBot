@@ -1,11 +1,10 @@
+import re
+
 from aiogram import Router, types, F
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from bot.api_ import create_company, create_user, get_user_language, get_company_language, update_company_language
+from bot.api_ import create_company, create_user
 from bot.keyboard.k_button import contact_user, main_menu, person, person_ru
-
-
-# from django.utils.translation import gettext_lazy as _
 
 
 class RegisterForm(StatesGroup):
@@ -21,14 +20,12 @@ router = Router()
 
 @router.message(F.text == '🇺🇿')
 async def lang_uz(message: types.Message):
-    update_company_language(message.from_user.id, 'uz')
     await message.answer(text='Harakatni tanlang 〽️:', reply_markup=person())
 
 
-# @router.message(F.text == '🇷🇺')
-# async def lang_ru(message: types.Message):
-#     update_company_language(message.from_user.id, 'ru')
-#     await message.answer(text='Выберите действие 〽️:', reply_markup=person_ru())
+@router.message(F.text == '🇷🇺')
+async def lang_ru(message: types.Message):
+    await message.answer(text='Выберите действие 〽️:', reply_markup=person_ru())
 
 
 @router.message(F.text == 'yuridik shaxs')
@@ -90,26 +87,25 @@ async def process_company_contact(message: types.Message, state: FSMContext):
     await state.update_data(company_contact=contact)
     user_data = await state.get_data()
 
-    # Foydalanuvchini yaratish
-    response_message = create_company(
+    response_message = await create_company(
         telegram_id=message.from_user.id,
         company_name=user_data['company_name'],
         employee_number=user_data['employee_number'],
         lifetime=user_data['lifetime'],
         company_employee_name=user_data['company_employee_name'],
-        company_contact=contact
+        company_contact=user_data['company_contact']
+
     )
 
-    language = get_company_language(message.from_user.id)
-    success_text = await get_text('registration_success', language)
-    result = (f"Kompaniya nomi: {user_data['company_name']}\n"
-              f"Xodimlar soni: {user_data['employee_number']}\n"
-              f"Davomiylik: {user_data['lifetime']} kun\n"
-              f"Kompaniya xodimining ismi: {user_data['company_employee_name']}\n"
-              f"Kontakt ma'lumotlari: {contact}")
+    result = (f"Kompaniya nomi: {user_data['company_name']}\n\n"
+              f"Xodimlar soni: {user_data['employee_number']}\n\n"
+              f"Davomiylik: {user_data['lifetime']} kun\n\n"
+              f"Kompaniya xodimining ismi: {user_data['company_employee_name']}\n\n"
+              f"Kontakt ma'lumotlari: {user_data['company_contact']}")
 
-    await message.reply(f"{success_text}\n{result}\n\n{response_message}",
-                        reply_markup=main_menu())
+    await message.answer(f"{result}\n\n{response_message}",
+                         reply_markup=main_menu())
+
     await state.clear()
 
 
@@ -119,84 +115,54 @@ class RegisterFormUser(StatesGroup):
     add_contact = State()
 
 
-async def get_text_user(text_key, language):
-    texts = {
-        'uz': {
-            'register': "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
-            'enter_name': "Ismingizni kiriting:",
-            'enter_contact': "Kontakt ma'lumotlarini kiriting:",
-            'add_contact': "Qo'shimcha kontakt ma'lumotlarini kiriting: \n\n Namuna: +998 (93) 068 29 11"
-        },
-        'ru': {
-            'register': "Регистрация успешно завершена!",
-            'enter_name': "Введите ваше имя:",
-            'enter_contact': "Введите контактные данные:",
-            'add_contact': "Введите дополнительные контактные данные: \n\n Образец: +998 (93) 068 29 11"
-        }
-    }
-    return texts.get(language, {}).get(text_key, text_key)
-
-
-# @router.message(F.text.in_(['jismoniy shaxs', 'юридическое лицо']))
-# async def physical_person(message: types.Message, state: FSMContext):
-#     language = get_user_language(message.from_user.id)
-#     text = await get_text_user('enter_name', language)
-#     await state.set_state(RegisterFormUser.name)
-#     await message.answer(text)
-
 @router.message(F.text == 'jismoniy shaxs')
 async def physical_person(message: types.Message, state: FSMContext):
-    language = get_user_language(message.from_user.id)
-    text = await get_text_user('enter_name', language)
     await state.set_state(RegisterFormUser.name)
-    await message.answer(text)
+    await message.answer(text="Ismingizni kiriting:")
 
 
 @router.message(F.text == 'юридическое лицо')
 async def physical_person(message: types.Message, state: FSMContext):
-    language = get_user_language(message.from_user.id)
-    text = await get_text_user('enter_name', language)
     await state.set_state(RegisterFormUser.name)
-    await message.answer(text)
+    await message.answer(text="Введите ваше имя:")
 
 
 @router.message(RegisterFormUser.name)
 async def process_user_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
-    language = get_company_language(message.from_user.id)
-    text = await get_text_user('enter_contact', language)
     await state.set_state(RegisterFormUser.contact)
-    await message.answer(text, reply_markup=contact_user())
+    await message.answer(text="Kontakt ma'lumotlarini kiriting:", reply_markup=contact_user())
 
 
 @router.message(RegisterFormUser.contact)
 async def process_user_contact(message: types.Message, state: FSMContext):
     contact = message.contact.phone_number
     await state.update_data(contact=contact)
-    language = get_company_language(message.from_user.id)
-    text = await get_text_user('add_contact', language)
     await state.set_state(RegisterFormUser.add_contact)
-    await message.answer(text, reply_markup=types.ReplyKeyboardRemove())
+    await message.answer(text="Qo'shimcha kontakt ma'lumotlarini kiriting:\n\n"
+                              "+998 (93) 068 29 11")
 
 
 @router.message(RegisterFormUser.add_contact)
 async def process_user_add_contact(message: types.Message, state: FSMContext):
-    await state.update_data(add_contact=message.text)
+    add_contact = message.text
+
+    # Validatsiya uchun regex
+    if not re.fullmatch(r'[+\d() -]+', add_contact):
+        await message.answer(
+            "Iltimos, kontakt ma'lumotlarini to'g'ri formatda kiriting \n\n (faqat raqamlar, +, (), va - ishlatilishi mumkin):\n\n"
+            "+998 (93) 068 29 11")
+        return
+
+    await state.update_data(add_contact=add_contact)
     user_data = await state.get_data()
 
-    response_message = create_user(
+    response_message = await create_user(
         telegram_id=message.from_user.id,
         name=user_data['name'],
         contact=user_data['contact'],
         add_contact=user_data['add_contact']
     )
 
-    language = get_company_language(message.from_user.id)
-    success_text = await get_text_user('register', language)
-    result = (f"Ism: {user_data['name']}\n"
-              f"Kontakt: {user_data['contact']}\n"
-              f"Qo'shimcha kontakt: {user_data['add_contact']}")
-
-    await message.reply(f"{success_text}\n{result}\n\n{response_message}",
-                        reply_markup=main_menu())
+    await message.answer(response_message)
     await state.clear()

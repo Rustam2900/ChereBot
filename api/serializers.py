@@ -7,7 +7,6 @@ class BotCompanySerializers(ModelSerializer):
         model = BotCompany
         fields = [
             'telegram_id',
-            'language',
             'company_name',
             'employee_number',
             'lifetime',
@@ -69,7 +68,6 @@ class BotUserSerializers(ModelSerializer):
         model = BotUser
         fields = [
             'telegram_id',
-            'language',
             'name',
             'contact',
             'add_contact',

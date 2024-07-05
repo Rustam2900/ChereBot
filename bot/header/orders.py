@@ -7,9 +7,9 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, MY_ORDERS
 from bot.keyboard.k_button import main_menu, back, settings, location_user, \
-    lang_change_settings, main_menu_ru
+    lang_change_settings
 from bot.api_ import get_product, fetch_user_orders, create_order_company, create_order_user, get_bot_user_id, \
-    get_bot_company_id, update_company_language
+    get_bot_company_id
 
 from datetime import datetime, timedelta
 
@@ -165,14 +165,20 @@ async def process_location(message: types.Message, state: FSMContext):
     amount = user_data['amount']
     latitude = message.location.latitude
     longitude = message.location.longitude
-    await message.reply(f"Siz {product} suvdan \n\n"
-                        f"{amount} ta buyurtma qildingiz. \n\n"
-                        f"Boshqa turdagi suvdan xarid qilmoqchi bo'lsangiz \n\n"
-                        f"yana buyurtma berish tugmasini bosing: ")
+    await message.answer(f"Siz {product} suvdan \n\n"
+                         f"{amount} ta buyurtma qildingiz. \n\n"
+                         f"Boshqa turdagi suvdan xarid qilmoqchi bo'lsangiz \n\n"
+                         f"yana buyurtma berish tugmasini bosing: ")
     telegram_id = message.from_user.id
+    print(telegram_id)
+
     bot_company_id = await get_bot_company_id(telegram_id)
     bot_user_id = await get_bot_user_id(telegram_id)
+
+    print(bot_company_id)
+    print(bot_user_id)
     print("if:##################################")
+
     if bot_company_id:
         order_message = create_order_company(bot_company_id=bot_company_id,
                                              product_name=product, amount=amount, latitude=latitude,
@@ -192,6 +198,7 @@ async def process_location(message: types.Message, state: FSMContext):
         print("else:##################################")
         print(order_message)
         print("else:##################################")
+
     await message.answer(order_message)
     await state.clear()
 
@@ -216,35 +223,16 @@ async def lang_chan(message: types.Message):
     await message.answer(text='Tilni tanlang 〽️:', reply_markup=lang_change_settings())
 
 
-async def update_language_and_respond(user_id, language, message):
-    # Tilni yangilash
-    update_company_language(user_id, language)
-
-    # Asosiy menyu matnini olish
-    if language == 'uz':
-        text = "Harakatni tanlang 〽️:"
-        reply_markup = main_menu()
-    else:
-        text = "Выберите действие 〽️:"
-        reply_markup = main_menu_ru()
-
-    # Foydalanuvchiga javob qaytarish
-    await message.answer(text=text, reply_markup=reply_markup)
-
-
 # Lang_uz function
 @router.message(F.text == '🇺🇿UZ')
 async def lang_uz(message: types.Message):
-    await update_language_and_respond(message.from_user.id, 'uz', message)
+    pass
 
 
 # Lang_ru function
 @router.message(F.text == '🇷🇺RU')
 async def lang_ru(message: types.Message):
-    await update_language_and_respond(message.from_user.id, 'ru', message)
-
-
-# update_company_language function
+    pass
 
 
 @router.callback_query(lambda c: c.data == 'back')
@@ -263,12 +251,12 @@ def format_time(time_string):
 async def send_periodic_notifications(chat_id, order_time, bot: Bot):
     start_time = datetime.strptime(order_time, "%Y-%m-%dT%H:%M:%S.%f%z")
     while True:
-        await asyncio.sleep(60)  # Har 1 daqiqada qayta tekshiradi
+        await asyncio.sleep(60)
         elapsed_time = datetime.now(start_time.tzinfo) - start_time
         elapsed_minutes = int(elapsed_time.total_seconds() // 60)
         await bot.send_message(chat_id,
                                text=f"Assalom, siz buyurtma berganingizga {elapsed_minutes} minut bo'ldi. Suvingiz tugamadimi? Bizning vazifamiz eslatib turish.")
-        if elapsed_minutes >= 60:  # 60 minutdan keyin to'xtatish
+        if elapsed_minutes >= 60:
             break
 
 
@@ -279,9 +267,7 @@ async def my_orders(message: types.Message, bot: Bot):
     telegram_id = message.from_user.id
     orders = await fetch_user_orders(telegram_id)
     if orders and len(orders) > 0:
-        # Buyurtmalarni vaqt bo'yicha tartiblash (eng yangi buyurtma eng birinchida bo'ladi)
         orders = sorted(orders, key=lambda x: x['create_at'], reverse=True)
-        # Eng yangi buyurtmani olish
         latest_order = orders[0]
         order_info = (
             f"Vaxti: {format_time(latest_order['create_at'])}, \n\n"
@@ -290,11 +276,9 @@ async def my_orders(message: types.Message, bot: Bot):
         )
         await message.answer(text=f"Sizning oxirgi buyurtmangiz:\n\n{order_info}")
 
-        # Eski eslatma jarayonini to'xtatish
         if latest_notification_task:
             latest_notification_task.cancel()
 
-        # Yangi eslatma jarayonini boshlash
         latest_notification_task = asyncio.create_task(
             send_periodic_notifications(message.chat.id, latest_order['create_at'], bot))
     else:

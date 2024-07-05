@@ -6,17 +6,19 @@ from api.models import BotCompany, Product, OrderCompany, OrderUser, Operator, B
 from api.serializers import BotUserSerializers, ProductSerializers, OrderUserSerializer, OrderCompanySerializer, \
     OperatorSerializer, \
     BotCompanySerializers
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 
 
-class BotCompanyApiView(ListCreateAPIView):
+class BotCompanyApiView(RetrieveAPIView):
     queryset = BotCompany.objects.all()
     serializer_class = BotCompanySerializers
+    lookup_field = 'telegram_id'
 
 
-class BotUserApiView(ListCreateAPIView):
+class BotUserApiView(RetrieveAPIView):
     queryset = BotUser.objects.all()
     serializer_class = BotUserSerializers
+    lookup_field = 'telegram_id'
 
 
 class ProductApiView(ListCreateAPIView):

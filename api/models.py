@@ -2,13 +2,13 @@ from django.db import models
 
 
 class BotCompany(models.Model):
-    LANGUAGE_CHOICES = [
-        ('uz', 'O\'zbekcha'),
-        ('ru', 'Русский'),
-    ]
+    # LANGUAGE_CHOICES = [
+    #     ('uz', 'O\'zbekcha'),
+    #     ('ru', 'Русский'),
+    # ]
 
     telegram_id = models.BigIntegerField(unique=True)
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='uz')
+    # language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='uz')
     company_name = models.CharField(max_length=100)
     employee_number = models.IntegerField()
     lifetime = models.IntegerField()
@@ -21,13 +21,13 @@ class BotCompany(models.Model):
 
 
 class BotUser(models.Model):
-    LANGUAGE_CHOICES = [
-        ('uz', 'O\'zbekcha'),
-        ('ru', 'Русский'),
-    ]
+    # LANGUAGE_CHOICES = [
+    #     ('uz', 'O\'zbekcha'),
+    #     ('ru', 'Русский'),
+    # ]
 
     telegram_id = models.BigIntegerField(unique=True)
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='uz')
+    # language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='uz')
     name = models.CharField(max_length=100)
     contact = models.CharField(max_length=35)
     add_contact = models.CharField(max_length=35)

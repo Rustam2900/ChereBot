@@ -80,7 +80,7 @@ def lang_change_settings():
 
 def person():
     kb = [
-        [KeyboardButton(text='yuridikt shaxs'),
+        [KeyboardButton(text='yuridik shaxs'),
          KeyboardButton(text='jismoniy shaxs'), ]
 
     ]
