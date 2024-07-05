@@ -1,16 +1,20 @@
-from .models import BotUser, Product, Order, Operator
+from .models import BotCompany, Product, OrderUser, Operator, BotUser, OrderCompany
 from rest_framework.serializers import ModelSerializer
 
 
-class BotUserSerializers(ModelSerializer):
+class BotCompanySerializers(ModelSerializer):
     class Meta:
-        model = BotUser
+        model = BotCompany
         fields = [
             'telegram_id',
-            'name',
-            'phone',
-            'create_at',
             'language',
+            'company_name',
+            'employee_number',
+            'lifetime',
+            'company_employee_name',
+            'company_contact',
+            'create_at'
+
         ]
 
 
@@ -25,11 +29,24 @@ class ProductSerializers(ModelSerializer):
         ]
 
 
-class OrderSerializer(ModelSerializer):
+class OrderCompanySerializer(ModelSerializer):
     class Meta:
-        model = Order
+        model = OrderCompany
         fields = [
-            'user_id',
+            'bot_company_id',
+            'create_at',
+            'product_name',
+            'amount',
+            'latitude',
+            'longitude'
+        ]
+
+
+class OrderUserSerializer(ModelSerializer):
+    class Meta:
+        model = OrderUser
+        fields = [
+            'bot_user_id',
             'create_at',
             'product_name',
             'amount',
@@ -44,4 +61,18 @@ class OperatorSerializer(ModelSerializer):
         fields = [
             'text',
             'operator_phone'
+        ]
+
+
+class BotUserSerializers(ModelSerializer):
+    class Meta:
+        model = BotUser
+        fields = [
+            'telegram_id',
+            'language',
+            'name',
+            'contact',
+            'add_contact',
+            'create_at'
+
         ]

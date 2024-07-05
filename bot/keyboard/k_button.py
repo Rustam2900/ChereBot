@@ -1,7 +1,7 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from ..conustant import ORDERS, MY_ORDERS, OPERATOR, SETTINGS, BACK, LANG_CHANGE, LOCATION, SETTINGS_RU, OPERATOR_RU, \
-    ORDERS_RU, MY_ORDERS_RU, ORDERS_EN, MY_ORDERS_EN, OPERATOR_EN, SETTINGS_EN
+    ORDERS_RU, MY_ORDERS_RU
 
 
 def main_menu():
@@ -17,15 +17,6 @@ def main_menu_ru():
     kb = [
         [KeyboardButton(text=ORDERS_RU), KeyboardButton(text=MY_ORDERS_RU)],
         [KeyboardButton(text=OPERATOR_RU), KeyboardButton(text=SETTINGS_RU)]
-    ]
-    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
-    return keyboard
-
-
-def main_menu_en():
-    kb = [
-        [KeyboardButton(text=ORDERS_EN), KeyboardButton(text=MY_ORDERS_EN)],
-        [KeyboardButton(text=OPERATOR_EN), KeyboardButton(text=SETTINGS_EN)]
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return keyboard
@@ -70,9 +61,37 @@ def settings():
 def lang_change():
     kb = [
         [KeyboardButton(text='🇺🇿'),
-         KeyboardButton(text='🇷🇺'), ],
-        [KeyboardButton(text='🇬🇧'),
-         KeyboardButton(text=BACK)]
+         KeyboardButton(text='🇷🇺'), ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    return keyboard
+
+
+def lang_change_settings():
+    kb = [
+        [KeyboardButton(text='🇺🇿UZ'),
+         KeyboardButton(text='🇷🇺RU'), ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    return keyboard
+
+
+def person():
+    kb = [
+        [KeyboardButton(text='yuridikt shaxs'),
+         KeyboardButton(text='jismoniy shaxs'), ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    return keyboard
+
+
+def person_ru():
+    kb = [
+        [KeyboardButton(text='юридическое лицо'),
+         KeyboardButton(text='физическое лицо'), ]
 
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)

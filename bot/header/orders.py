@@ -6,10 +6,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.conustant import OPERATOR, OPERATOR_TEXT, BACK, SETTINGS, LANG_CHANGE, ORDERS, MY_ORDERS
-from bot.keyboard.k_button import main_menu, back, settings, lang_change, location_user, main_menu_ru, main_menu_en
-from bot.api_ import get_product, create_order, fetch_user_orders
+from bot.keyboard.k_button import main_menu, back, settings, location_user, \
+    lang_change_settings, main_menu_ru
+from bot.api_ import get_product, fetch_user_orders, create_order_company, create_order_user, get_bot_user_id, \
+    get_bot_company_id, update_company_language
 
 from datetime import datetime, timedelta
+
+latest_notification_task = None
 
 router = Router()
 
@@ -161,17 +165,34 @@ async def process_location(message: types.Message, state: FSMContext):
     amount = user_data['amount']
     latitude = message.location.latitude
     longitude = message.location.longitude
-
     await message.reply(f"Siz {product} suvdan \n\n"
                         f"{amount} ta buyurtma qildingiz. \n\n"
                         f"Boshqa turdagi suvdan xarid qilmoqchi bo'lsangiz \n\n"
                         f"yana buyurtma berish tugmasini bosing: ")
-
-    order_message = create_order(user_id=message.from_user.id, product_name=product, amount=amount, latitude=latitude,
-                                 longitude=longitude)
-
+    telegram_id = message.from_user.id
+    bot_company_id = await get_bot_company_id(telegram_id)
+    bot_user_id = await get_bot_user_id(telegram_id)
+    print("if:##################################")
+    if bot_company_id:
+        order_message = create_order_company(bot_company_id=bot_company_id,
+                                             product_name=product, amount=amount, latitude=latitude,
+                                             longitude=longitude)
+        print("if:##################################")
+        print(order_message)
+        print("if:##################################")
+    elif bot_user_id:
+        order_message = create_order_user(bot_user_id=bot_user_id,
+                                          product_name=product, amount=amount, latitude=latitude,
+                                          longitude=longitude)
+        print("elif:##################################")
+        print(order_message)
+        print("elif:##################################")
+    else:
+        order_message = "Bot kompaniyasi yoki foydalanuvchisi aniqlanmadi."
+        print("else:##################################")
+        print(order_message)
+        print("else:##################################")
     await message.answer(order_message)
-
     await state.clear()
 
 
@@ -192,22 +213,38 @@ async def settings_help(message: types.Message):
 
 @router.message(F.text == LANG_CHANGE)
 async def lang_chan(message: types.Message):
-    await message.answer(text='Tilni tanlang 〽️:', reply_markup=lang_change())
+    await message.answer(text='Tilni tanlang 〽️:', reply_markup=lang_change_settings())
 
 
-@router.message(F.text == '🇺🇿')
+async def update_language_and_respond(user_id, language, message):
+    # Tilni yangilash
+    update_company_language(user_id, language)
+
+    # Asosiy menyu matnini olish
+    if language == 'uz':
+        text = "Harakatni tanlang 〽️:"
+        reply_markup = main_menu()
+    else:
+        text = "Выберите действие 〽️:"
+        reply_markup = main_menu_ru()
+
+    # Foydalanuvchiga javob qaytarish
+    await message.answer(text=text, reply_markup=reply_markup)
+
+
+# Lang_uz function
+@router.message(F.text == '🇺🇿UZ')
 async def lang_uz(message: types.Message):
-    await message.answer(text='Harakatni tanlang 〽️:', reply_markup=main_menu())
+    await update_language_and_respond(message.from_user.id, 'uz', message)
 
 
-@router.message(F.text == '🇷🇺')
+# Lang_ru function
+@router.message(F.text == '🇷🇺RU')
 async def lang_ru(message: types.Message):
-    await message.answer(text='Выберите действие 〽️:', reply_markup=main_menu_ru())
+    await update_language_and_respond(message.from_user.id, 'ru', message)
 
 
-@router.message(F.text == '🇬🇧')
-async def lang_en(message: types.Message):
-    await message.answer(text='Choose an action 〽️:', reply_markup=main_menu_en())
+# update_company_language function
 
 
 @router.callback_query(lambda c: c.data == 'back')
@@ -228,25 +265,37 @@ async def send_periodic_notifications(chat_id, order_time, bot: Bot):
     while True:
         await asyncio.sleep(60)  # Har 1 daqiqada qayta tekshiradi
         elapsed_time = datetime.now(start_time.tzinfo) - start_time
-        elapsed_seconds = elapsed_time.total_seconds()
-        if elapsed_seconds > 60:  # 60 sekunddan ko'p vaqt o'tganini tekshirish
-            await bot.send_message(chat_id,
-                                   text=f"Assalom, siz buyurtma berganingizga {int(elapsed_seconds // 60)} vaxt bo'ldi. Suvingiz tugamadimi? Bizning vazifamiz eslatib turish.")
+        elapsed_minutes = int(elapsed_time.total_seconds() // 60)
+        await bot.send_message(chat_id,
+                               text=f"Assalom, siz buyurtma berganingizga {elapsed_minutes} minut bo'ldi. Suvingiz tugamadimi? Bizning vazifamiz eslatib turish.")
+        if elapsed_minutes >= 60:  # 60 minutdan keyin to'xtatish
             break
 
 
 @router.message(F.text == MY_ORDERS)
 async def my_orders(message: types.Message, bot: Bot):
+    global latest_notification_task
+
     telegram_id = message.from_user.id
     orders = await fetch_user_orders(telegram_id)
     if orders and len(orders) > 0:
-        order_list = "\n\n".join(
-            [f"Vaxti: {format_time(order['create_at'])}, \n\n"
-             f"Mahsulot: {order['product_name']}, \n\n"
-             f"Miqdori: {order['amount']}" for order in orders])
-        await message.answer(text=f"Sizning buyurtmalaringiz:\n\n{order_list}")
-        # Har bir buyurtma uchun xabar yuborishni boshlash
-        for order in orders:
-            asyncio.create_task(send_periodic_notifications(message.chat.id, order['create_at'], bot))
+        # Buyurtmalarni vaqt bo'yicha tartiblash (eng yangi buyurtma eng birinchida bo'ladi)
+        orders = sorted(orders, key=lambda x: x['create_at'], reverse=True)
+        # Eng yangi buyurtmani olish
+        latest_order = orders[0]
+        order_info = (
+            f"Vaxti: {format_time(latest_order['create_at'])}, \n\n"
+            f"Mahsulot: {latest_order['product_name']}, \n\n"
+            f"Miqdori: {latest_order['amount']}"
+        )
+        await message.answer(text=f"Sizning oxirgi buyurtmangiz:\n\n{order_info}")
+
+        # Eski eslatma jarayonini to'xtatish
+        if latest_notification_task:
+            latest_notification_task.cancel()
+
+        # Yangi eslatma jarayonini boshlash
+        latest_notification_task = asyncio.create_task(
+            send_periodic_notifications(message.chat.id, latest_order['create_at'], bot))
     else:
         await message.answer(text="Siz hali hech nima buyurtma qilmagansiz.")
