@@ -20,11 +20,11 @@ def choose_who_is_this_person():
     builder.add(
         *[
             KeyboardButton(
-                text="Jismoniy shaxs",
+                text=str(constants.INDIVIDUAL),
 
             ),
             KeyboardButton(
-                text="Yuridik shaxs"
+                text=str(constants.LEGAL_ENTITY)
             )
         ]
     )
