@@ -11,10 +11,11 @@ from redis.typing import ExpiryT
 class DjangoRedisStorage(BaseStorage):
     def __init__(
             self,
+            bot: Optional[Bot] = None,
             key_builder: Optional[KeyBuilder] = None,
             state_ttl: Optional[ExpiryT] = None,
             data_ttl: Optional[ExpiryT] = None,
-            bot: Optional[Bot] = None,
+
     ):
         if key_builder is None:
             key_builder = DefaultKeyBuilder(with_destiny=True)
@@ -38,7 +39,9 @@ class DjangoRedisStorage(BaseStorage):
         redis_key = self.key_builder.build(key, "state")
         value = await cache.aget(redis_key)
         if isinstance(value, bytes):
-            return value.decode("utf-8")
+            value = value.decode("utf-8")
+        if value is None:
+            return None
         return cast(Optional[str], value)
 
     async def set_data(self, key: StorageKey, data: Dict[str, Any]) -> None:
@@ -59,7 +62,7 @@ class DjangoRedisStorage(BaseStorage):
             return {}
         if isinstance(value, bytes):
             value = value.decode("utf-8")
-        return cast(Dict[str, Any], self.bot.session.json_loads(value))
+        return self.bot.session.json_loads(value)
 
     async def close(self) -> None:
         await cache.aclose()
