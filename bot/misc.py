@@ -6,11 +6,10 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from django.conf import settings
 
+from bot.middlewares import setup as setup_middlewares
 from bot.helpers import get_webhook_url
 from bot.routers import router
 from bot.utils.storage import DjangoRedisStorage
-
-from bot.utils.middlewares import authentication, i18n
 
 dp = Dispatcher(storage=DjangoRedisStorage(), )
 bot_session = AiohttpSession()
@@ -18,9 +17,7 @@ bot_session = AiohttpSession()
 bot = Bot(settings.BOT_TOKEN, session=bot_session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 dp.include_router(router)
-dp.update.outer_middleware.register(
-    authentication.AuthenticationMiddleware())  # if you want summarize all of middlewares in function init_middleware
-dp.update.outer_middleware.register(i18n.I18Middleware())
+setup_middlewares(dp)
 
 
 async def on_startup():
