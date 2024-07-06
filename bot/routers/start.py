@@ -2,11 +2,10 @@ import logging
 
 import phonenumbers
 from aiogram import Router, types, flags
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import gettext_lazy as _
 
 from bot import constants
 from bot.filters.callback_data import LanguageCallbackData
@@ -23,7 +22,7 @@ router = Router()
 @flags.rate_limit(key="start_handler")
 async def start_handler(message: types.Message, user_obj: User):
     if user_obj:
-        await message.answer(text="Main")
+        await message.answer(text=str(constants.CHOOSE_SECTION), reply_markup=keyboard_markup.main_menu())
     else:
         await message.answer(text=str(constants.CHOOSE_LANGUAGE), reply_markup=inline_markup.choose_language())
 
@@ -103,7 +102,8 @@ async def phone_number_callback(message: types.Message, state: FSMContext):
                         user=user,
                         profile_type=Profile.INDIVIDUAL,
                     )
-            await message.answer("Successfully registered.")
+            await message.answer("Successfully registered.", reply_markup=types.ReplyKeyboardRemove())
+            await state.clear()
             await start_handler(message, user)
         else:
             await message.answer(str("Please send phone number with send contact button."),

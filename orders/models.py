@@ -7,11 +7,33 @@ from utils.models import BaseModel
 
 
 class Order(BaseModel):
+    MONTHLY = 'MONTHLY'
+    WEEKLY = 'WEEKLY'
+
+    RECURRENCE_CHOICES = (
+        (MONTHLY, 'Monthly'),
+        (WEEKLY, 'Weekly'),
+    )
+
+    PENDING = 'PENDING'
+    COMPLETED = 'COMPLETED'
+    ACCEPTED = 'ACCEPTED'
+    ACTIVE = 'ACTIVE'
+    CANCELLED = 'CANCELLED'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (COMPLETED, 'Completed'),
+        (ACCEPTED, 'Accepted'),
+        (ACTIVE, 'Active'),
+        (CANCELLED, 'Cancelled'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()  # later change long, lat
-    start_date = models.DateTimeField(default=timezone.now)
+    status = models.CharField(choices=STATUS_CHOICES, default=PENDING, max_length=10)
+    start_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    recurrence = models.CharField(max_length=50, null=True, blank=True)
+    recurrence = models.CharField(choices=STATUS_CHOICES, default=MONTHLY, max_length=10)
+    next_delivery_date = models.DateTimeField(null=True, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
@@ -22,7 +44,6 @@ class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-
     quantity = models.PositiveIntegerField()
 
     def __str__(self):

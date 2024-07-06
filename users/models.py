@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    total_amount_spent = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)  # New field
 
     objects = UserManager()
     USERNAME_FIELD = "phone"

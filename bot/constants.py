@@ -17,3 +17,11 @@ COMMON_ERROR_TEXT = _("An error occurred. Try again later.")
 
 REQUEST_CONTACT_TEXT = _("Send your phone number to register\n"
                          "Send the number in this format +998*********")
+
+CHOOSE_SECTION = _("Choose section 👇")
+
+MAIN_TEXT = _("Hello and welcome to the bot.")
+SETTINGS = _("⚙️ Settings")
+MY_ORDERS = _("📖 My orders")
+OPERATOR = _("📞 Connect with the operator")
+MAKE_ORDER = _("🛒 Make order")
