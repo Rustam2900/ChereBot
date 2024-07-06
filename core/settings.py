@@ -1,16 +1,18 @@
+import json
+import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+load_dotenv(BASE_DIR / '.env')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q$na06e!q8%#+bq_g(*_^45336id2zwl8nv@k*2mi9wd8pkp0l'
+HOST = os.environ['HOST']
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-q$na06e!q8%#+bq_g(*_^45336id2zwl8nv@k*2mi9wd8pkp0l')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = json.loads(os.environ['DEBUG'])
 
 ALLOWED_HOSTS = []
 
@@ -23,9 +25,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
-    # apps_
-    'rest_framework'
+
+    'users.apps.UsersConfig',
+    'bot.apps.BotConfig',
+    'utils.apps.UtilsConfig',
+    'products.apps.ProductsConfig',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
@@ -63,8 +68,22 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', 5432),
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ['REDIS_URL'],
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -86,22 +105,80 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication
+AUTH_USER_MODEL = "users.User"
+
+# Phone number field
+PHONENUMBER_DB_FORMAT = 'NATIONAL'
+PHONENUMBER_DEFAULT_REGION = 'UZ'
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+LANGUAGE_CODE = 'uz'
 
-# TIME_ZONE = "Asia/Tashkent"
+
+# This function is used to translate language names
+def gettext(s):
+    return s
+
+
+LANGUAGES = (
+    ('uz', gettext('Uzbek')),
+    ('en', gettext('English')),
+    ('ru', gettext('Russian'))
+
+)
+
+TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Bot settings
+BOT_TOKEN = os.environ['BOT_TOKEN']
+BOT_WEBHOOK_PATH = "bot-process-updates"
+
+LIFESPAN_CONTEXT = 'core.lifespan.lifespan_context'
+DJANGO_SETTINGS_MODULE = 'core.settings'  # if you want do multiple settings, inside settings file base, dev, prod
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'ERROR'),
+            'propagate': False,
+        },
+        'aiogram': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+
+}
