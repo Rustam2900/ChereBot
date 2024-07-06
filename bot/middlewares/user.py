@@ -21,7 +21,7 @@ class CheckUserMiddleware(BaseMiddleware):
         user: types.User = data.get('event_from_user')
         user_obj = await User.objects.filter(telegram_id=user.id).afirst()
 
-        if user_obj and user_obj.refresh_token:
+        if user_obj:
             data['user_obj'] = user_obj
             translation.activate(user_obj.language or settings.LANGUAGE_CODE)
         else:

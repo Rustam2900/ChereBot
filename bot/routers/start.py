@@ -1,19 +1,23 @@
-from aiogram import Router, types
-from aiogram.filters import Command
+from aiogram import Router, types, flags
+from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from django.utils.translation import gettext_lazy as _
 
+from bot import constants
 from bot.filters.states import Registration
+from bot.keyboards import inline_markup
 from users.models import User
 
 router = Router()
 
 
-@router.message(Command("start"))
-async def on_start(message: types.Message, user: User):
-    await message.reply(
-        _("Salom, {first_name}").format(first_name=user.first_name)
-    )
+@router.message(CommandStart())
+@flags.rate_limit(key="start_handler")
+async def start_handler(message: types.Message, user_obj: User):
+    if user_obj:
+        await message.answer(text="Main")
+    else:
+        await message.answer(text=str(constants.CHOOSE_LANGUAGE), reply_markup=inline_markup.choose_language())
 
 
 @router.message(Command("registration"))
