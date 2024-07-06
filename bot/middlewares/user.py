@@ -28,7 +28,7 @@ class CheckUserMiddleware(BaseMiddleware):
             data['user_obj'] = None
             state: FSMContext = data.get('state')
             state_data = await state.get_data()
-            translation.activate(state_data.get('language') or user.language_code)
+            translation.activate(state_data.get('language') or user.language)
         return await handler(event, data)
 
 
