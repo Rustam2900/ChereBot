@@ -11,10 +11,10 @@ from bot.helpers import get_webhook_url
 from bot.routers import router
 from bot.utils.storage import DjangoRedisStorage
 
-dp = Dispatcher(storage=DjangoRedisStorage(), )
 bot_session = AiohttpSession()
-
 bot = Bot(settings.BOT_TOKEN, session=bot_session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
+dp = Dispatcher(storage=DjangoRedisStorage(bot))
 
 dp.include_router(router)
 setup_middlewares(dp)
